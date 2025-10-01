@@ -21,9 +21,12 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     return <Navigate to="/login" replace />;
   }
 
-  if (profile?.role === 'pendiente') {
+  // Si el usuario está logueado pero aún no tenemos su perfil (o su rol es pendiente),
+  // lo enviamos a la página de espera. Esta es la zona segura.
+  if (!profile || profile.role === 'pendiente') {
     return <Navigate to="/pending-approval" replace />;
   }
 
+  // Solo si tenemos un perfil y el rol NO es pendiente, mostramos el contenido.
   return <>{children}</>;
 }

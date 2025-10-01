@@ -18,9 +18,12 @@ export default function PublicRoute({ children }: PublicRouteProps) {
   }
 
   if (user) {
-    if (profile?.role === 'pendiente') {
+    // Si el usuario está logueado, decidimos a dónde redirigirlo.
+    // Si no tenemos perfil o es pendiente, va a la página de espera.
+    if (!profile || profile.role === 'pendiente') {
       return <Navigate to="/pending-approval" replace />;
     }
+    // Si tiene un rol válido, va al dashboard.
     return <Navigate to="/dashboard" replace />;
   }
 
