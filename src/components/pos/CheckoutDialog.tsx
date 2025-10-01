@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { supabase } from "@/integrations/supabase/client";
 import { showError, showSuccess } from "@/utils/toast";
 import { useState } from "react";
-import { CartItem } from "@/pages/dashboard/POSPage";
+import { CartItem } from "@/pages/dashboard/SalesPage";
 
 interface CheckoutDialogProps {
   isOpen: boolean;

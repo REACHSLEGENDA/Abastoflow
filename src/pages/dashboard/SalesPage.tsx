@@ -1,119 +1,100 @@
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { PlusCircle } from "lucide-react";
+import { useState } from "react";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import ProductSelection from "@/components/pos/ProductSelection";
+import CurrentSale from "@/components/pos/CurrentSale";
 import { showError } from "@/utils/toast";
-import SaleForm from "@/components/dashboard/SaleForm";
+
+export interface CartItem {
+  product_id: string;
+  product_name: string;
+  quantity: number;
+  price_per_item: number;
+  cost_per_item: number;
+  available_stock: number;
+}
 
 export default function SalesPage() {
-  const [sales, setSales] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [cart, setCart] = useState<CartItem[]>([]);
 
-  async function fetchSales() {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("sales")
-      .select("*")
-      .order("sale_date", { ascending: false });
-
-    if (error) {
-      showError("Error al cargar las ventas: " + error.message);
-    } else {
-      setSales(data || []);
-    }
-    setLoading(false);
-  }
-
-  useEffect(() => {
-    fetchSales();
-  }, []);
-
-  const handleAddSale = () => {
-    setIsFormOpen(true);
+  const addToCart = (product: any) => {
+    setCart((prevCart) => {
+      const existingItem = prevCart.find((item) => item.product_id === product.id);
+      if (existingItem) {
+        if (existingItem.quantity < existingItem.available_stock) {
+          return prevCart.map((item) =>
+            item.product_id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          );
+        } else {
+          showError("No hay más stock disponible para este producto.");
+          return prevCart;
+        }
+      } else {
+        if (product.current_stock > 0) {
+          return [
+            ...prevCart,
+            {
+              product_id: product.id,
+              product_name: product.name,
+              quantity: 1,
+              price_per_item: product.sale_price,
+              cost_per_item: product.purchase_cost || 0,
+              available_stock: product.current_stock,
+            },
+          ];
+        } else {
+          showError("Este producto no tiene stock disponible.");
+          return prevCart;
+        }
+      }
+    });
   };
 
-  const getPaymentMethodVariant = (method: string) => {
-    switch (method) {
-      case 'tarjeta':
-        return 'secondary';
-      case 'transferencia':
-        return 'outline';
-      default:
-        return 'default';
-    }
-  }
+  const updateQuantity = (productId: string, newQuantity: number) => {
+    setCart((prevCart) =>
+      prevCart.map((item) => {
+        if (item.product_id === productId) {
+          if (newQuantity > 0 && newQuantity <= item.available_stock) {
+            return { ...item, quantity: newQuantity };
+          } else if (newQuantity > item.available_stock) {
+            showError("No puedes vender más de lo que hay en stock.");
+            return item;
+          }
+        }
+        return item;
+      }).filter(item => item.quantity > 0)
+    );
+  };
+
+  const removeFromCart = (productId: string) => {
+    setCart((prevCart) => prevCart.filter((item) => item.product_id !== productId));
+  };
+
+  const clearCart = () => {
+    setCart([]);
+  };
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
+    <div className="h-[calc(100vh-80px)] flex flex-col">
+       <div className="flex justify-between items-center mb-4">
         <div>
-          <h1 className="text-2xl font-bold">Gestión de Ventas</h1>
-          <p className="text-muted-foreground">Aquí podrás registrar y consultar tus ventas.</p>
+          <h1 className="text-2xl font-bold">Punto de Venta</h1>
+          <p className="text-muted-foreground">Registra ventas de forma rápida y eficiente.</p>
         </div>
-        <Button onClick={handleAddSale}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Registrar Venta
-        </Button>
       </div>
-
-      <div className="rounded-lg border shadow-sm">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Fecha</TableHead>
-              <TableHead>Cliente</TableHead>
-              <TableHead>Método de Pago</TableHead>
-              <TableHead className="text-right">Monto Total</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {loading ? (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center h-24">
-                  Cargando ventas...
-                </TableCell>
-              </TableRow>
-            ) : sales.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center h-24">
-                  No has registrado ninguna venta todavía.
-                </TableCell>
-              </TableRow>
-            ) : (
-              sales.map((sale) => (
-                <TableRow key={sale.id}>
-                  <TableCell>
-                    {new Date(sale.sale_date).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="font-medium">{sale.customer_name || "Mostrador"}</TableCell>
-                  <TableCell>
-                    <Badge variant={getPaymentMethodVariant(sale.payment_method)}>
-                      {sale.payment_method.charAt(0).toUpperCase() + sale.payment_method.slice(1)}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">${parseFloat(sale.total_amount).toFixed(2)}</TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      <SaleForm
-        isOpen={isFormOpen}
-        setIsOpen={setIsFormOpen}
-        onSuccess={fetchSales}
-      />
+      <ResizablePanelGroup direction="horizontal" className="flex-grow rounded-lg border">
+        <ResizablePanel defaultSize={60}>
+          <ProductSelection onProductSelect={addToCart} />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={40}>
+          <CurrentSale
+            cart={cart}
+            onUpdateQuantity={updateQuantity}
+            onRemoveFromCart={removeFromCart}
+            onClearCart={clearCart}
+          />
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   );
 }

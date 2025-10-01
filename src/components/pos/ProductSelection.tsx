@@ -20,7 +20,7 @@ export default function ProductSelection({ onProductSelect }: ProductSelectionPr
       setLoading(true);
       const { data, error } = await supabase
         .from("products")
-        .select("id, name, sale_price, current_stock, sku")
+        .select("id, name, sale_price, current_stock, sku, purchase_cost")
         .order("name");
       
       if (error) {

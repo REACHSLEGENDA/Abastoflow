@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Trash2, XCircle } from "lucide-react";
-import { CartItem } from "@/pages/dashboard/POSPage";
+import { CartItem } from "@/pages/dashboard/SalesPage";
 import { useState } from "react";
 import CheckoutDialog from "./CheckoutDialog";
 
