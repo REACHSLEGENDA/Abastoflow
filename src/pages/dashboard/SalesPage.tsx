@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import ProductSelection from "@/components/pos/ProductSelection";
 import CurrentSale from "@/components/pos/CurrentSale";
 import { showError } from "@/utils/toast";
+import { supabase } from "@/integrations/supabase/client";
+import { Badge } from "@/components/ui/badge";
 
 export interface CartItem {
   product_id: string;
@@ -15,6 +19,27 @@ export interface CartItem {
 
 export default function SalesPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [salesHistory, setSalesHistory] = useState<any[]>([]);
+  const [loadingHistory, setLoadingHistory] = useState(true);
+
+  async function fetchSalesHistory() {
+    setLoadingHistory(true);
+    const { data, error } = await supabase
+      .from("sales")
+      .select("*")
+      .order("sale_date", { ascending: false });
+
+    if (error) {
+      showError("Error al cargar el historial de ventas: " + error.message);
+    } else {
+      setSalesHistory(data || []);
+    }
+    setLoadingHistory(false);
+  }
+
+  useEffect(() => {
+    fetchSalesHistory();
+  }, []);
 
   const addToCart = (product: any) => {
     setCart((prevCart) => {
@@ -73,28 +98,86 @@ export default function SalesPage() {
     setCart([]);
   };
 
+  const handleSaleSuccess = () => {
+    clearCart();
+    fetchSalesHistory();
+  };
+
   return (
-    <div className="h-[calc(100vh-80px)] flex flex-col">
-       <div className="flex justify-between items-center mb-4">
+    <Tabs defaultValue="pos" className="h-full flex flex-col">
+      <div className="flex justify-between items-center mb-4">
         <div>
-          <h1 className="text-2xl font-bold">Punto de Venta</h1>
-          <p className="text-muted-foreground">Registra ventas de forma rápida y eficiente.</p>
+          <h1 className="text-2xl font-bold">Ventas</h1>
+          <p className="text-muted-foreground">Registra ventas y consulta el historial.</p>
         </div>
+        <TabsList>
+          <TabsTrigger value="pos">Punto de Venta</TabsTrigger>
+          <TabsTrigger value="history">Historial de Ventas</TabsTrigger>
+        </TabsList>
       </div>
-      <ResizablePanelGroup direction="horizontal" className="flex-grow rounded-lg border">
-        <ResizablePanel defaultSize={60}>
-          <ProductSelection onProductSelect={addToCart} />
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={40}>
-          <CurrentSale
-            cart={cart}
-            onUpdateQuantity={updateQuantity}
-            onRemoveFromCart={removeFromCart}
-            onClearCart={clearCart}
-          />
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </div>
+      
+      <TabsContent value="pos" className="flex-grow">
+        <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-150px)] rounded-lg border">
+          <ResizablePanel defaultSize={60}>
+            <ProductSelection onProductSelect={addToCart} />
+          </ResizablePanel>
+          <ResizableHandle withHandle />
+          <ResizablePanel defaultSize={40}>
+            <CurrentSale
+              cart={cart}
+              onUpdateQuantity={updateQuantity}
+              onRemoveFromCart={removeFromCart}
+              onClearCart={clearCart}
+              onSaleSuccess={handleSaleSuccess}
+            />
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </TabsContent>
+
+      <TabsContent value="history" className="flex-grow">
+        <div className="rounded-lg border shadow-sm h-full overflow-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Fecha</TableHead>
+                <TableHead>Cliente</TableHead>
+                <TableHead>Método de Pago</TableHead>
+                <TableHead className="text-right">Monto Total</TableHead>
+                <TableHead className="text-right">Ganancia</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {loadingHistory ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center h-24">
+                    Cargando historial...
+                  </TableCell>
+                </TableRow>
+              ) : salesHistory.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center h-24">
+                    No hay ventas registradas todavía.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                salesHistory.map((sale) => (
+                  <TableRow key={sale.id}>
+                    <TableCell>
+                      {new Date(sale.sale_date).toLocaleString('es-MX')}
+                    </TableCell>
+                    <TableCell className="font-medium">{sale.customer_name || "Mostrador"}</TableCell>
+                    <TableCell>
+                      <Badge variant="outline">{sale.payment_method}</Badge>
+                    </TableCell>
+                    <TableCell className="text-right">${(sale.total_amount || 0).toFixed(2)}</TableCell>
+                    <TableCell className="text-right">${(sale.total_profit || 0).toFixed(2)}</TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </TabsContent>
+    </Tabs>
   );
 }

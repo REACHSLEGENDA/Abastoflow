@@ -12,9 +12,10 @@ interface CurrentSaleProps {
   onUpdateQuantity: (productId: string, newQuantity: number) => void;
   onRemoveFromCart: (productId: string) => void;
   onClearCart: () => void;
+  onSaleSuccess: () => void;
 }
 
-export default function CurrentSale({ cart, onUpdateQuantity, onRemoveFromCart, onClearCart }: CurrentSaleProps) {
+export default function CurrentSale({ cart, onUpdateQuantity, onRemoveFromCart, onClearCart, onSaleSuccess }: CurrentSaleProps) {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const total = cart.reduce((acc, item) => acc + item.quantity * item.price_per_item, 0);
 
@@ -84,7 +85,7 @@ export default function CurrentSale({ cart, onUpdateQuantity, onRemoveFromCart, 
         setIsOpen={setIsCheckoutOpen}
         cart={cart}
         total={total}
-        onSuccess={onClearCart}
+        onSuccess={onSaleSuccess}
       />
     </div>
   );
