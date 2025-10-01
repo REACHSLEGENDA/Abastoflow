@@ -48,7 +48,7 @@ export default function LoginPage() {
       showError(error.message);
     } else {
       showSuccess("¡Bienvenido de vuelta!");
-      navigate("/dashboard");
+      // La redirección ahora será manejada por los componentes de ruta
     }
   }
 
