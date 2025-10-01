@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { PlusCircle } from "lucide-react";
 import { showError } from "@/utils/toast";
-// import SaleForm from "@/components/dashboard/SaleForm"; // Se importará más adelante
+import SaleForm from "@/components/dashboard/SaleForm";
 
 export default function SalesPage() {
   const [sales, setSales] = useState<any[]>([]);
@@ -38,8 +38,7 @@ export default function SalesPage() {
   }, []);
 
   const handleAddSale = () => {
-    // Lógica para abrir el formulario
-    // setIsFormOpen(true);
+    setIsFormOpen(true);
   };
 
   return (
@@ -49,7 +48,7 @@ export default function SalesPage() {
           <h1 className="text-2xl font-bold">Gestión de Ventas</h1>
           <p className="text-muted-foreground">Aquí podrás registrar y consultar tus ventas.</p>
         </div>
-        <Button onClick={handleAddSale} disabled>
+        <Button onClick={handleAddSale}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Registrar Venta
         </Button>
@@ -92,13 +91,11 @@ export default function SalesPage() {
         </Table>
       </div>
 
-      {/* 
       <SaleForm
         isOpen={isFormOpen}
         setIsOpen={setIsFormOpen}
         onSuccess={fetchSales}
-      /> 
-      */}
+      />
     </div>
   );
 }
