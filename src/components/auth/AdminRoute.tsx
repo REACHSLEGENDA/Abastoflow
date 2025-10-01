@@ -2,11 +2,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Navigate } from "react-router-dom";
 import { ReactNode } from "react";
 
-interface PublicRouteProps {
+interface AdminRouteProps {
   children: ReactNode;
 }
 
-export default function PublicRoute({ children }: PublicRouteProps) {
+export default function AdminRoute({ children }: AdminRouteProps) {
   const { user, profile, loading } = useAuth();
 
   if (loading) {
@@ -17,13 +17,11 @@ export default function PublicRoute({ children }: PublicRouteProps) {
     );
   }
 
-  if (user) {
-    if (profile?.role === 'admin') {
-      return <Navigate to="/admin/dashboard" replace />;
-    }
-    if (profile?.role === 'pendiente') {
-      return <Navigate to="/pending-approval" replace />;
-    }
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (profile?.role !== 'admin') {
     return <Navigate to="/dashboard" replace />;
   }
 
