@@ -47,7 +47,7 @@ export function UserNav() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => navigate('/dashboard/perfil')}>
             Perfil
           </DropdownMenuItem>
           <DropdownMenuItem>
