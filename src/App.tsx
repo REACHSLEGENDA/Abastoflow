@@ -22,58 +22,63 @@ import SuppliersPage from "./pages/dashboard/SuppliersPage";
 import PurchasesPage from "./pages/dashboard/PurchasesPage";
 import ReportsPage from "./pages/dashboard/ReportsPage";
 import ProfilePage from "./pages/dashboard/ProfilePage";
+import { ThemeProvider } from "./components/theme-provider";
+import SettingsPage from "./pages/dashboard/SettingsPage";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            {/* Rutas Públicas */}
-            <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />
-            <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-            <Route path="/registro" element={<PublicRoute><RegisterPage /></PublicRoute>} />
-            
-            {/* Rutas de Autenticación de Usuario */}
-            <Route path="/pending-approval" element={<PendingApprovalPage />} />
-            
-            {/* Rutas del Dashboard (Protegidas y con Layout) */}
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
-                  <DashboardLayout />
-                </ProtectedRoute>
-              }
-            >
-              <Route index element={<DashboardPage />} />
-              <Route path="ventas" element={<SalesPage />} />
-              <Route path="compras" element={<PurchasesPage />} />
-              <Route path="inventario" element={<InventoryPage />} />
-              <Route path="proveedores" element={<SuppliersPage />} />
-              <Route path="reportes" element={<ReportsPage />} />
-              <Route path="perfil" element={<ProfilePage />} />
-            </Route>
+      <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              {/* Rutas Públicas */}
+              <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />
+              <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+              <Route path="/registro" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+              
+              {/* Rutas de Autenticación de Usuario */}
+              <Route path="/pending-approval" element={<PendingApprovalPage />} />
+              
+              {/* Rutas del Dashboard (Protegidas y con Layout) */}
+              <Route 
+                path="/dashboard" 
+                element={
+                  <ProtectedRoute>
+                    <DashboardLayout />
+                  </ProtectedRoute>
+                }
+              >
+                <Route index element={<DashboardPage />} />
+                <Route path="ventas" element={<SalesPage />} />
+                <Route path="compras" element={<PurchasesPage />} />
+                <Route path="inventario" element={<InventoryPage />} />
+                <Route path="proveedores" element={<SuppliersPage />} />
+                <Route path="reportes" element={<ReportsPage />} />
+                <Route path="perfil" element={<ProfilePage />} />
+                <Route path="ajustes" element={<SettingsPage />} />
+              </Route>
 
-            {/* Rutas de Administración */}
-            <Route path="/admin/login" element={<AdminLoginPage />} />
-            <Route 
-              path="/admin/dashboard" 
-              element={
-                <AdminRoute>
-                  <AdminDashboardPage />
-                </AdminRoute>
-              } 
-            />
-            
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
+              {/* Rutas de Administración */}
+              <Route path="/admin/login" element={<AdminLoginPage />} />
+              <Route 
+                path="/admin/dashboard" 
+                element={
+                  <AdminRoute>
+                    <AdminDashboardPage />
+                  </AdminRoute>
+                } 
+              />
+              
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </ThemeProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );
