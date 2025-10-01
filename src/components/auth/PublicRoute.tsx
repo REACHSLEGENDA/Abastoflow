@@ -18,9 +18,6 @@ export default function PublicRoute({ children }: PublicRouteProps) {
   }
 
   if (user) {
-    if (profile?.role === 'admin') {
-      return <Navigate to="/admin/dashboard" replace />;
-    }
     if (profile?.role === 'pendiente') {
       return <Navigate to="/pending-approval" replace />;
     }

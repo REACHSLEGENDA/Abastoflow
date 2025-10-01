@@ -12,8 +12,6 @@ import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import PublicRoute from "./components/auth/PublicRoute";
 import PendingApprovalPage from "./pages/auth/PendingApprovalPage";
-import AdminRoute from "./components/auth/AdminRoute";
-import AdminDashboard from "./pages/admin/AdminDashboard";
 
 const queryClient = new QueryClient();
 
@@ -25,15 +23,12 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <Routes>
-            {/* Rutas Públicas */}
             <Route path="/" element={<PublicRoute><Index /></PublicRoute>} />
             <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
             <Route path="/registro" element={<PublicRoute><RegisterPage /></PublicRoute>} />
             
-            {/* Ruta para usuarios pendientes */}
             <Route path="/pending-approval" element={<PendingApprovalPage />} />
 
-            {/* Rutas Protegidas para Usuarios */}
             <Route 
               path="/dashboard" 
               element={
@@ -41,16 +36,6 @@ const App = () => (
                   <Dashboard />
                 </ProtectedRoute>
               } 
-            />
-
-            {/* Ruta Protegida para Administradores */}
-            <Route
-              path="/admin/dashboard"
-              element={
-                <AdminRoute>
-                  <AdminDashboard />
-                </AdminRoute>
-              }
             />
             
             <Route path="*" element={<NotFound />} />

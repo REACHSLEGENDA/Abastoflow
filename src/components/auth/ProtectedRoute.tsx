@@ -20,10 +20,6 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-  
-  if (profile?.role === 'admin') {
-    return <Navigate to="/admin/dashboard" replace />;
-  }
 
   if (profile?.role === 'pendiente') {
     return <Navigate to="/pending-approval" replace />;
