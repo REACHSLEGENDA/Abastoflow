@@ -25,6 +25,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Calendar } from "@/components/ui/calendar";
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { showError, showSuccess } from "@/utils/toast";
 import { useEffect, useState } from "react";
 import { CalendarIcon, Check, ChevronsUpDown, Trash2 } from "lucide-react";
@@ -46,6 +47,9 @@ const saleItemSchema = z.object({
 const saleSchema = z.object({
   customer_name: z.string().optional(),
   sale_date: z.date(),
+  payment_method: z.enum(["efectivo", "tarjeta", "transferencia"], {
+    required_error: "Debes seleccionar un método de pago.",
+  }),
   notes: z.string().optional(),
   items: z.array(saleItemSchema).min(1, "Debes agregar al menos un producto."),
 });
@@ -66,6 +70,7 @@ export default function SaleForm({ isOpen, setIsOpen, onSuccess }: SaleFormProps
     resolver: zodResolver(saleSchema),
     defaultValues: {
       sale_date: new Date(),
+      payment_method: "efectivo",
       items: [],
     },
   });
@@ -108,6 +113,7 @@ export default function SaleForm({ isOpen, setIsOpen, onSuccess }: SaleFormProps
         sale_date: values.sale_date.toISOString(),
         notes: values.notes,
         total_amount: totalAmount,
+        payment_method: values.payment_method,
       })
       .select()
       .single();
@@ -147,7 +153,7 @@ export default function SaleForm({ isOpen, setIsOpen, onSuccess }: SaleFormProps
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <FormField
                 control={form.control}
                 name="customer_name"
@@ -183,6 +189,28 @@ export default function SaleForm({ isOpen, setIsOpen, onSuccess }: SaleFormProps
                         <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date()} initialFocus />
                       </PopoverContent>
                     </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="payment_method"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Método de Pago</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecciona un método" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="efectivo">Efectivo</SelectItem>
+                        <SelectItem value="tarjeta">Tarjeta</SelectItem>
+                        <SelectItem value="transferencia">Transferencia</SelectItem>
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

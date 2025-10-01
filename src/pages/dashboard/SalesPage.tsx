@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import { PlusCircle } from "lucide-react";
 import { showError } from "@/utils/toast";
 import SaleForm from "@/components/dashboard/SaleForm";
@@ -41,6 +42,17 @@ export default function SalesPage() {
     setIsFormOpen(true);
   };
 
+  const getPaymentMethodVariant = (method: string) => {
+    switch (method) {
+      case 'tarjeta':
+        return 'secondary';
+      case 'transferencia':
+        return 'outline';
+      default:
+        return 'default';
+    }
+  }
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -60,19 +72,20 @@ export default function SalesPage() {
             <TableRow>
               <TableHead>Fecha</TableHead>
               <TableHead>Cliente</TableHead>
+              <TableHead>Método de Pago</TableHead>
               <TableHead className="text-right">Monto Total</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading ? (
               <TableRow>
-                <TableCell colSpan={3} className="text-center h-24">
+                <TableCell colSpan={4} className="text-center h-24">
                   Cargando ventas...
                 </TableCell>
               </TableRow>
             ) : sales.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={3} className="text-center h-24">
+                <TableCell colSpan={4} className="text-center h-24">
                   No has registrado ninguna venta todavía.
                 </TableCell>
               </TableRow>
@@ -83,6 +96,11 @@ export default function SalesPage() {
                     {new Date(sale.sale_date).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="font-medium">{sale.customer_name || "Mostrador"}</TableCell>
+                  <TableCell>
+                    <Badge variant={getPaymentMethodVariant(sale.payment_method)}>
+                      {sale.payment_method.charAt(0).toUpperCase() + sale.payment_method.slice(1)}
+                    </Badge>
+                  </TableCell>
                   <TableCell className="text-right">${parseFloat(sale.total_amount).toFixed(2)}</TableCell>
                 </TableRow>
               ))
