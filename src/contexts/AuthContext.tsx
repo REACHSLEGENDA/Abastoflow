@@ -7,7 +7,7 @@ export type UserProfile = {
   full_name: string | null;
   commerce_name: string | null;
   phone: string | null;
-  role: string;
+  role: 'pendiente' | 'aprobado' | 'admin' | 'cajero';
   updated_at: string | null;
 };
 

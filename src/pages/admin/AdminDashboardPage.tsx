@@ -55,7 +55,7 @@ export default function AdminDashboardPage() {
     } else {
       showSuccess("Rol actualizado correctamente.");
       setProfiles((prevProfiles) =>
-        prevProfiles.map((p) => (p.id === userId ? { ...p, role: newRole } : p))
+        prevProfiles.map((p) => (p.id === userId ? { ...p, role: newRole as UserProfile['role'] } : p))
       );
     }
   };
@@ -109,6 +109,7 @@ export default function AdminDashboardPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="aprobado">Aprobado</SelectItem>
+                          <SelectItem value="cajero">Cajero</SelectItem>
                           <SelectItem value="pendiente">Pendiente</SelectItem>
                           <SelectItem value="admin">Admin</SelectItem>
                         </SelectContent>

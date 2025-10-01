@@ -1,14 +1,19 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { Link, NavLink, Outlet, useLocation, Navigate } from "react-router-dom";
 import { Home, ShoppingCart, Truck, Receipt, BarChart3 } from "lucide-react";
 import { UserNav } from "@/components/layout/UserNav";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Sidebar = () => {
+  const { profile } = useAuth();
   const navLinkClass = ({ isActive }: { isActive: boolean }) =>
     cn(
       "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
       isActive && "bg-muted text-primary"
     );
+
+  const isOwner = profile?.role === 'aprobado';
+  const isCashier = profile?.role === 'cajero';
 
   return (
     <div className="hidden border-r bg-muted/40 md:block">
@@ -20,30 +25,36 @@ const Sidebar = () => {
         </div>
         <div className="flex-1 overflow-auto py-2">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-            <NavLink to="/dashboard" end className={navLinkClass}>
-              <Home className="h-4 w-4" />
-              Inicio
-            </NavLink>
+            {isOwner && (
+              <NavLink to="/dashboard" end className={navLinkClass}>
+                <Home className="h-4 w-4" />
+                Inicio
+              </NavLink>
+            )}
             <NavLink to="/dashboard/ventas" className={navLinkClass}>
               <ShoppingCart className="h-4 w-4" />
               Ventas
             </NavLink>
-            <NavLink to="/dashboard/compras" className={navLinkClass}>
-              <Receipt className="h-4 w-4" />
-              Compras
-            </NavLink>
-            <NavLink to="/dashboard/inventario" className={navLinkClass}>
-              <Home className="h-4 w-4" />
-              Inventario
-            </NavLink>
-            <NavLink to="/dashboard/proveedores" className={navLinkClass}>
-              <Truck className="h-4 w-4" />
-              Proveedores
-            </NavLink>
-            <NavLink to="/dashboard/reportes" className={navLinkClass}>
-              <BarChart3 className="h-4 w-4" />
-              Reportes
-            </NavLink>
+            {isOwner && (
+              <>
+                <NavLink to="/dashboard/compras" className={navLinkClass}>
+                  <Receipt className="h-4 w-4" />
+                  Compras
+                </NavLink>
+                <NavLink to="/dashboard/inventario" className={navLinkClass}>
+                  <Home className="h-4 w-4" />
+                  Inventario
+                </NavLink>
+                <NavLink to="/dashboard/proveedores" className={navLinkClass}>
+                  <Truck className="h-4 w-4" />
+                  Proveedores
+                </NavLink>
+                <NavLink to="/dashboard/reportes" className={navLinkClass}>
+                  <BarChart3 className="h-4 w-4" />
+                  Reportes
+                </NavLink>
+              </>
+            )}
           </nav>
         </div>
       </div>
@@ -61,6 +72,20 @@ const Header = () => (
 );
 
 export default function DashboardLayout() {
+  const { profile } = useAuth();
+  const location = useLocation();
+
+  const allowedCashierRoutes = [
+    '/dashboard/ventas',
+    '/dashboard/perfil',
+    '/dashboard/ajustes'
+  ];
+
+  if (profile?.role === 'cajero' && !allowedCashierRoutes.includes(location.pathname)) {
+    // Si es cajero y está en una ruta no permitida (como el index /dashboard), lo redirigimos
+    return <Navigate to="/dashboard/ventas" replace />;
+  }
+
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
       <Sidebar />
