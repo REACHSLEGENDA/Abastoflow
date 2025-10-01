@@ -157,7 +157,7 @@ export default function ProductForm({ isOpen, setIsOpen, onSuccess, productToEdi
                   <FormItem>
                     <FormLabel>Stock Actual</FormLabel>
                     <FormControl>
-                      <Input type="number" placeholder="0" {...field} />
+                      <Input type="number" min="0" placeholder="0" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -172,7 +172,7 @@ export default function ProductForm({ isOpen, setIsOpen, onSuccess, productToEdi
                   <FormItem>
                     <FormLabel>Precio de Venta</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                      <Input type="number" min="0" step="0.01" placeholder="0.00" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -185,7 +185,7 @@ export default function ProductForm({ isOpen, setIsOpen, onSuccess, productToEdi
                   <FormItem>
                     <FormLabel>Costo de Compra (Opcional)</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.01" placeholder="0.00" {...field} />
+                      <Input type="number" min="0" step="0.01" placeholder="0.00" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -199,7 +199,7 @@ export default function ProductForm({ isOpen, setIsOpen, onSuccess, productToEdi
                 <FormItem>
                   <FormLabel>Alerta de Stock Mínimo (Opcional)</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="0" {...field} />
+                    <Input type="number" min="0" placeholder="0" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
