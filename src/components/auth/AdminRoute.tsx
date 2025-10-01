@@ -17,10 +17,9 @@ export default function AdminRoute({ children }: AdminRouteProps) {
     );
   }
 
-  // Si no hay usuario, perfil, o el rol no es 'admin', lo sacamos de aquí.
+  // Si no es un admin, lo mandamos a una ruta segura que no cause un bucle.
   if (!user || !profile || profile.role !== 'admin') {
-    // Lo mandamos a una ruta neutral y que el sistema decida a dónde va.
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   // Si todo está en orden, es un admin y puede ver la página.

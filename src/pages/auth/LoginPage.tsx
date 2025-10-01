@@ -48,7 +48,7 @@ export default function LoginPage() {
       showError(error.message);
     } else {
       showSuccess("¡Bienvenido de vuelta!");
-      // La redirección ahora será manejada por los componentes de ruta
+      navigate("/"); // Ir a la página de inicio y dejar que el enrutador decida
     }
   }
 
