@@ -1,18 +1,104 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { PlusCircle } from "lucide-react";
+import { showError } from "@/utils/toast";
+// import SaleForm from "@/components/dashboard/SaleForm"; // Se importará más adelante
+
 export default function SalesPage() {
+  const [sales, setSales] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isFormOpen, setIsFormOpen] = useState(false);
+
+  async function fetchSales() {
+    setLoading(true);
+    const { data, error } = await supabase
+      .from("sales")
+      .select("*")
+      .order("sale_date", { ascending: false });
+
+    if (error) {
+      showError("Error al cargar las ventas: " + error.message);
+    } else {
+      setSales(data || []);
+    }
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    fetchSales();
+  }, []);
+
+  const handleAddSale = () => {
+    // Lógica para abrir el formulario
+    // setIsFormOpen(true);
+  };
+
   return (
     <div>
-      <h1 className="text-2xl font-bold">Gestión de Ventas</h1>
-      <p className="text-muted-foreground">Aquí podrás registrar y consultar tus ventas.</p>
-      <div className="mt-8 flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm min-h-[400px]">
-        <div className="flex flex-col items-center gap-1 text-center p-8">
-          <h3 className="text-2xl font-bold tracking-tight">
-            Próximamente
-          </h3>
-          <p className="text-sm text-muted-foreground">
-            La funcionalidad de gestión de ventas está en construcción.
-          </p>
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">Gestión de Ventas</h1>
+          <p className="text-muted-foreground">Aquí podrás registrar y consultar tus ventas.</p>
         </div>
+        <Button onClick={handleAddSale} disabled>
+          <PlusCircle className="mr-2 h-4 w-4" />
+          Registrar Venta
+        </Button>
       </div>
+
+      <div className="rounded-lg border shadow-sm">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Fecha</TableHead>
+              <TableHead>Cliente</TableHead>
+              <TableHead className="text-right">Monto Total</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center h-24">
+                  Cargando ventas...
+                </TableCell>
+              </TableRow>
+            ) : sales.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={3} className="text-center h-24">
+                  No has registrado ninguna venta todavía.
+                </TableCell>
+              </TableRow>
+            ) : (
+              sales.map((sale) => (
+                <TableRow key={sale.id}>
+                  <TableCell>
+                    {new Date(sale.sale_date).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell className="font-medium">{sale.customer_name || "Mostrador"}</TableCell>
+                  <TableCell className="text-right">${parseFloat(sale.total_amount).toFixed(2)}</TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* 
+      <SaleForm
+        isOpen={isFormOpen}
+        setIsOpen={setIsFormOpen}
+        onSuccess={fetchSales}
+      /> 
+      */}
     </div>
   );
 }
