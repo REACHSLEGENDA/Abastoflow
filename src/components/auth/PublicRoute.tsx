@@ -17,15 +17,17 @@ export default function PublicRoute({ children }: PublicRouteProps) {
     );
   }
 
-  if (user) {
-    if (profile?.role === 'admin') {
+  // Si ya terminó de cargar y tenemos un usuario con perfil, lo redirigimos fuera de la página pública.
+  if (user && profile) {
+    if (profile.role === 'admin') {
       return <Navigate to="/admin/dashboard" replace />;
     }
-    if (profile?.role === 'pendiente') {
+    if (profile.role === 'pendiente') {
       return <Navigate to="/pending-approval" replace />;
     }
     return <Navigate to="/dashboard" replace />;
   }
 
+  // Si no, mostramos la página pública (login, registro, etc.)
   return <>{children}</>;
 }

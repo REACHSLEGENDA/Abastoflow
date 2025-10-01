@@ -17,17 +17,21 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
     );
   }
 
-  if (!user) {
+  // Si no hay usuario o perfil, lo mandamos a login.
+  if (!user || !profile) {
     return <Navigate to="/login" replace />;
   }
   
-  if (profile?.role === 'admin') {
+  // Si es un admin, no debería estar aquí, lo mandamos a su panel.
+  if (profile.role === 'admin') {
     return <Navigate to="/admin/dashboard" replace />;
   }
 
-  if (profile?.role === 'pendiente') {
+  // Si está pendiente, a la página de espera.
+  if (profile.role === 'pendiente') {
     return <Navigate to="/pending-approval" replace />;
   }
 
+  // Si es un usuario aprobado, puede ver el contenido.
   return <>{children}</>;
 }

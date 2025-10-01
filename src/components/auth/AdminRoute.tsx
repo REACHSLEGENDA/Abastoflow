@@ -17,13 +17,12 @@ export default function AdminRoute({ children }: AdminRouteProps) {
     );
   }
 
-  if (!user) {
-    return <Navigate to="/login" replace />;
-  }
-
-  if (profile?.role !== 'admin') {
+  // Si no hay usuario, perfil, o el rol no es 'admin', lo sacamos de aquí.
+  if (!user || !profile || profile.role !== 'admin') {
+    // Lo mandamos a una ruta neutral y que el sistema decida a dónde va.
     return <Navigate to="/dashboard" replace />;
   }
 
+  // Si todo está en orden, es un admin y puede ver la página.
   return <>{children}</>;
 }
