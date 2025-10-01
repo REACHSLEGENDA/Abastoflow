@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { Package, Home, ShoppingCart, Truck, Receipt, BarChart3 } from "lucide-react";
+import { Package, Home, ShoppingCart, Truck, Receipt, BarChart3, User, Settings } from "lucide-react";
 import { UserNav } from "@/components/layout/UserNav";
 import { cn } from "@/lib/utils";
 
@@ -12,14 +12,14 @@ const Sidebar = () => {
 
   return (
     <div className="hidden border-r bg-muted/40 md:block">
-      <div className="flex h-full max-h-screen flex-col gap-2">
+      <div className="flex h-full max-h-screen flex-col">
         <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
           <Link to="/dashboard" className="flex items-center gap-2 font-semibold">
             <Package className="h-6 w-6" />
             <span className="">AbastoFlow</span>
           </Link>
         </div>
-        <div className="flex-1">
+        <div className="flex-1 overflow-auto py-2">
           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
             <NavLink to="/dashboard" end className={navLinkClass}>
               <Home className="h-4 w-4" />
@@ -46,6 +46,18 @@ const Sidebar = () => {
               Reportes
             </NavLink>
           </nav>
+        </div>
+        <div className="mt-auto border-t p-2">
+           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+             <NavLink to="/dashboard/ajustes" className={navLinkClass}>
+               <Settings className="h-4 w-4" />
+               Ajustes
+             </NavLink>
+             <NavLink to="/dashboard/perfil" className={navLinkClass}>
+               <User className="h-4 w-4" />
+               Perfil
+             </NavLink>
+           </nav>
         </div>
       </div>
     </div>

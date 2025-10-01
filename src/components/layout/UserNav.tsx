@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { ChevronDown, LogOut, Settings, User } from "lucide-react";
 
 export function UserNav() {
   const { profile, signOut } = useAuth();
@@ -29,11 +30,12 @@ export function UserNav() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+        <Button variant="ghost" className="relative flex items-center gap-x-2 p-1">
           <Avatar className="h-8 w-8">
             <AvatarImage src="/placeholder.svg" alt="Avatar" />
             <AvatarFallback>{getInitials(profile?.full_name)}</AvatarFallback>
           </Avatar>
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
@@ -48,15 +50,18 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem onClick={() => navigate('/dashboard/perfil')}>
-            Perfil
+            <User className="mr-2 h-4 w-4" />
+            <span>Perfil</span>
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => navigate('/dashboard/ajustes')}>
-            Ajustes
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Ajustes</span>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleLogout}>
-          Cerrar sesión
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Cerrar sesión</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
