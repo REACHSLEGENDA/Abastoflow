@@ -46,18 +46,6 @@ const Sidebar = () => {
             </NavLink>
           </nav>
         </div>
-        <div className="mt-auto border-t p-2">
-           <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-             <NavLink to="/dashboard/ajustes" className={navLinkClass}>
-               <Settings className="h-4 w-4" />
-               Ajustes
-             </NavLink>
-             <NavLink to="/dashboard/perfil" className={navLinkClass}>
-               <User className="h-4 w-4" />
-               Perfil
-             </NavLink>
-           </nav>
-        </div>
       </div>
     </div>
   );
