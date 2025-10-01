@@ -20,6 +20,7 @@ import SalesPage from "./pages/dashboard/SalesPage";
 import InventoryPage from "./pages/dashboard/InventoryPage";
 import SuppliersPage from "./pages/dashboard/SuppliersPage";
 import PurchasesPage from "./pages/dashboard/PurchasesPage";
+import ReportsPage from "./pages/dashboard/ReportsPage";
 
 const queryClient = new QueryClient();
 
@@ -53,6 +54,7 @@ const App = () => (
               <Route path="compras" element={<PurchasesPage />} />
               <Route path="inventario" element={<InventoryPage />} />
               <Route path="proveedores" element={<SuppliersPage />} />
+              <Route path="reportes" element={<ReportsPage />} />
             </Route>
 
             {/* Rutas de Administración */}

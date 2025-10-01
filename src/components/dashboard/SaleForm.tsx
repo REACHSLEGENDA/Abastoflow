@@ -38,6 +38,7 @@ const saleItemSchema = z.object({
   product_name: z.string(),
   quantity: z.coerce.number().int().positive("La cantidad debe ser mayor a 0."),
   price_per_item: z.coerce.number().min(0, "El precio no puede ser negativo."),
+  cost_per_item: z.coerce.number().min(0),
   available_stock: z.number().int(),
 }).refine(data => data.quantity <= data.available_stock, {
   message: "No hay suficiente stock.",
@@ -82,7 +83,7 @@ export default function SaleForm({ isOpen, setIsOpen, onSuccess }: SaleFormProps
 
   useEffect(() => {
     async function fetchProducts() {
-      const { data, error } = await supabase.from("products").select("id, name, sale_price, current_stock");
+      const { data, error } = await supabase.from("products").select("id, name, sale_price, purchase_cost, current_stock");
       if (error) {
         showError("Error al cargar productos para la búsqueda.");
       } else {
@@ -104,6 +105,11 @@ export default function SaleForm({ isOpen, setIsOpen, onSuccess }: SaleFormProps
       return;
     }
 
+    const totalProfit = values.items.reduce((acc, item) => {
+      const profitPerItem = (item.price_per_item || 0) - (item.cost_per_item || 0);
+      return acc + (profitPerItem * (item.quantity || 0));
+    }, 0);
+
     // 1. Insertar la venta principal
     const { data: sale, error: saleError } = await supabase
       .from("sales")
@@ -113,6 +119,7 @@ export default function SaleForm({ isOpen, setIsOpen, onSuccess }: SaleFormProps
         sale_date: values.sale_date.toISOString(),
         notes: values.notes,
         total_amount: totalAmount,
+        total_profit: totalProfit,
         payment_method: values.payment_method,
       })
       .select()
@@ -129,6 +136,7 @@ export default function SaleForm({ isOpen, setIsOpen, onSuccess }: SaleFormProps
       product_id: item.product_id,
       quantity: item.quantity,
       price_per_item: item.price_per_item,
+      cost_per_item: item.cost_per_item,
     }));
 
     const { error: itemsError } = await supabase.from("sale_items").insert(saleItems);
@@ -292,6 +300,7 @@ export default function SaleForm({ isOpen, setIsOpen, onSuccess }: SaleFormProps
                               product_name: product.name,
                               quantity: 1,
                               price_per_item: product.sale_price,
+                              cost_per_item: product.purchase_cost || 0,
                               available_stock: product.current_stock,
                             });
                             setOpenProductSearch(false);
