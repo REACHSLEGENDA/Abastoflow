@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 via-white to-blue-100 dark:from-gray-900 dark:via-blue-900/20 dark:to-gray-900">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-200 to-blue-400 dark:from-blue-900 dark:to-indigo-950">
       <div className="text-center p-8">
         <h1 className="text-5xl font-bold mb-4 text-gray-900 dark:text-white">Bienvenido a AbastoFlow</h1>
         <p className="text-xl text-gray-600 dark:text-gray-300 mb-8">

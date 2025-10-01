@@ -13,7 +13,7 @@ import { Link } from "react-router-dom";
 
 export default function LoginPage() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-100 dark:from-gray-900 dark:via-blue-900/20 dark:to-gray-900">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-200 to-blue-400 dark:from-blue-900 dark:to-indigo-950">
       <Card className="w-full max-w-sm bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm shadow-2xl rounded-2xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Bienvenido a AbastoFlow</CardTitle>
