@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/table";
 import { PlusCircle } from "lucide-react";
 import { showError } from "@/utils/toast";
-// import PurchaseForm from "@/components/dashboard/PurchaseForm"; // Se importará más adelante
+import PurchaseForm from "@/components/dashboard/PurchaseForm";
 
 export default function PurchasesPage() {
   const [purchases, setPurchases] = useState<any[]>([]);
@@ -38,8 +38,7 @@ export default function PurchasesPage() {
   }, []);
 
   const handleAddPurchase = () => {
-    // Lógica para abrir el formulario
-    // setIsFormOpen(true);
+    setIsFormOpen(true);
   };
 
   return (
@@ -49,7 +48,7 @@ export default function PurchasesPage() {
           <h1 className="text-2xl font-bold">Gestión de Compras</h1>
           <p className="text-muted-foreground">Registra las compras de tus proveedores.</p>
         </div>
-        <Button onClick={handleAddPurchase} disabled>
+        <Button onClick={handleAddPurchase}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Registrar Compra
         </Button>
@@ -84,7 +83,7 @@ export default function PurchasesPage() {
                     {new Date(purchase.purchase_date).toLocaleDateString()}
                   </TableCell>
                   <TableCell className="font-medium">{purchase.supplier_name || "N/A"}</TableCell>
-                  <TableCell className="text-right">${purchase.total_cost.toFixed(2)}</TableCell>
+                  <TableCell className="text-right">${parseFloat(purchase.total_cost).toFixed(2)}</TableCell>
                 </TableRow>
               ))
             )}
@@ -92,13 +91,11 @@ export default function PurchasesPage() {
         </Table>
       </div>
 
-      {/* 
       <PurchaseForm
         isOpen={isFormOpen}
         setIsOpen={setIsFormOpen}
         onSuccess={fetchPurchases}
-      /> 
-      */}
+      />
     </div>
   );
 }
