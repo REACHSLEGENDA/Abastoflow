@@ -19,10 +19,25 @@ export default function PendingApprovalPage() {
     }
   }, [user, profile, loading, navigate]);
 
-  if (loading || !profile || profile.role !== 'pendiente') {
-    return <div className="flex items-center justify-center min-h-screen"><p>Cargando...</p></div>;
+  // Mientras se carga el perfil, muestra un estado de carga temático e informativo.
+  if (loading || !profile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-yellow-100 to-orange-200 dark:from-gray-800 dark:to-gray-900">
+        <Card className="w-full max-w-md text-center bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm shadow-2xl rounded-2xl animate-pulse">
+          <CardHeader>
+            <CardTitle className="text-2xl">Verificando tu cuenta</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="mb-6 text-gray-700 dark:text-gray-300">
+              Estamos revisando el estado de tu cuenta. Un momento por favor...
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
+  // Una vez confirmado que el usuario está pendiente, muestra el mensaje completo.
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-yellow-100 to-orange-200 dark:from-gray-800 dark:to-gray-900">
       <Card className="w-full max-w-md text-center bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm shadow-2xl rounded-2xl">
