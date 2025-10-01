@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet } from "react-router-dom";
-import { Package, Home, ShoppingCart, Truck, Receipt, BarChart3, User, Settings } from "lucide-react";
+import { Home, ShoppingCart, Truck, Receipt, BarChart3, User, Settings } from "lucide-react";
 import { UserNav } from "@/components/layout/UserNav";
 import { cn } from "@/lib/utils";
 
@@ -15,8 +15,7 @@ const Sidebar = () => {
       <div className="flex h-full max-h-screen flex-col">
         <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
           <Link to="/dashboard" className="flex items-center gap-2 font-semibold">
-            <Package className="h-6 w-6" />
-            <span className="">AbastoFlow</span>
+            <img src="/logo.png" alt="AbastoFlow Logo" className="h-8 w-auto" />
           </Link>
         </div>
         <div className="flex-1 overflow-auto py-2">
@@ -34,7 +33,7 @@ const Sidebar = () => {
               Compras
             </NavLink>
             <NavLink to="/dashboard/inventario" className={navLinkClass}>
-              <Package className="h-4 w-4" />
+              <Home className="h-4 w-4" />
               Inventario
             </NavLink>
             <NavLink to="/dashboard/proveedores" className={navLinkClass}>

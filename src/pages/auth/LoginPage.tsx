@@ -53,10 +53,11 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-200 to-blue-400 dark:from-blue-900 dark:to-indigo-950">
-      <Card className="w-full max-w-sm bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm shadow-2xl rounded-2xl">
+    <div className="flex items-center justify-center min-h-screen bg-gray-950">
+      <Card className="w-full max-w-sm bg-gray-950/80 backdrop-blur-sm shadow-2xl rounded-2xl border-blue-500/20">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Bienvenido a AbastoFlow</CardTitle>
+          <img src="/logo.png" alt="AbastoFlow" className="w-32 mx-auto mb-4" />
+          <CardTitle className="text-2xl">Bienvenido de vuelta</CardTitle>
           <CardDescription>
             Ingresa tus credenciales para acceder.
           </CardDescription>
@@ -95,9 +96,9 @@ export default function LoginPage() {
               <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold shadow-lg" disabled={loading}>
                 {loading ? "Accediendo..." : "Acceder"}
               </Button>
-              <p className="mt-4 text-xs text-center text-gray-700 dark:text-gray-300">
+              <p className="mt-4 text-xs text-center text-gray-300">
                 ¿No tienes una cuenta?{" "}
-                <Link to="/registro" className=" text-blue-600 hover:underline font-semibold">
+                <Link to="/registro" className=" text-blue-500 hover:underline font-semibold">
                   Regístrate
                 </Link>
               </p>

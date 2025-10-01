@@ -66,10 +66,11 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-200 to-blue-400 dark:from-blue-900 dark:to-indigo-950 py-12">
-      <Card className="w-full max-w-md bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm shadow-2xl rounded-2xl">
+    <div className="flex items-center justify-center min-h-screen bg-gray-950 py-12">
+      <Card className="w-full max-w-md bg-gray-950/80 backdrop-blur-sm shadow-2xl rounded-2xl border-blue-500/20">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Crea tu cuenta en AbastoFlow</CardTitle>
+          <img src="/logo.png" alt="AbastoFlow" className="w-32 mx-auto mb-4" />
+          <CardTitle className="text-2xl">Crea tu cuenta</CardTitle>
           <CardDescription>
             Tu cuenta será revisada por un administrador antes de ser activada.
           </CardDescription>
@@ -149,9 +150,9 @@ export default function RegisterPage() {
               <Button type="submit" className="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold shadow-lg" disabled={loading}>
                 {loading ? "Creando cuenta..." : "Crear Cuenta"}
               </Button>
-              <p className="mt-4 text-xs text-center text-gray-700 dark:text-gray-300">
+              <p className="mt-4 text-xs text-center text-gray-300">
                 ¿Ya tienes una cuenta?{" "}
-                <Link to="/login" className=" text-blue-600 hover:underline font-semibold">
+                <Link to="/login" className=" text-blue-500 hover:underline font-semibold">
                   Inicia Sesión
                 </Link>
               </p>

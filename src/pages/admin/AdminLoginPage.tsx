@@ -74,9 +74,10 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-700 to-gray-900">
-      <Card className="w-full max-w-sm bg-white/90 dark:bg-gray-950/90 backdrop-blur-sm shadow-2xl rounded-2xl">
+    <div className="flex items-center justify-center min-h-screen bg-gray-900">
+      <Card className="w-full max-w-sm bg-gray-950/90 backdrop-blur-sm shadow-2xl rounded-2xl border-blue-500/20">
         <CardHeader className="text-center">
+          <img src="/logo.png" alt="AbastoFlow" className="w-32 mx-auto mb-4" />
           <CardTitle className="text-2xl">Portal de Administrador</CardTitle>
           <CardDescription>
             Ingresa tus credenciales de administrador.
