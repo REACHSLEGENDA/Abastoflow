@@ -4,18 +4,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Skeleton } from "@/components/ui/skeleton";
 import { Bar, BarChart, ResponsiveContainer, XAxis, YAxis, Tooltip } from "recharts";
 import { useAuth } from "@/contexts/AuthContext";
+import { DateRange } from "react-day-picker";
 
-export default function TopProfitableProductsChart() {
+interface TopProfitableProductsChartProps {
+  dateRange?: DateRange;
+}
+
+export default function TopProfitableProductsChart({ dateRange }: TopProfitableProductsChartProps) {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   useEffect(() => {
     async function fetchData() {
-      if (!user) return;
+      if (!user || !dateRange?.from || !dateRange?.to) return;
       setLoading(true);
       
-      const { data: chartData, error } = await supabase.rpc('get_top_profitable_products', { user_uuid: user.id });
+      const { data: chartData, error } = await supabase.rpc('get_top_profitable_products_by_date', { 
+        user_uuid: user.id,
+        start_date: dateRange.from.toISOString(),
+        end_date: dateRange.to.toISOString(),
+      });
 
       if (error) {
         console.error("Error fetching top profitable products:", error);
@@ -28,13 +37,13 @@ export default function TopProfitableProductsChart() {
     }
 
     fetchData();
-  }, [user]);
+  }, [user, dateRange]);
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Top 5 Productos Más Rentables</CardTitle>
-        <CardDescription>Productos que generan mayor ganancia.</CardDescription>
+        <CardDescription>Productos que generan mayor ganancia en el período.</CardDescription>
       </CardHeader>
       <CardContent>
         {loading ? (
