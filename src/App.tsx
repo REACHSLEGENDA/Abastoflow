@@ -24,6 +24,7 @@ import ReportsPage from "./pages/dashboard/ReportsPage";
 import ProfilePage from "./pages/dashboard/ProfilePage";
 import { ThemeProvider } from "./components/theme-provider";
 import SettingsPage from "./pages/dashboard/SettingsPage";
+import POSPage from "./pages/dashboard/POSPage";
 
 const queryClient = new QueryClient();
 
@@ -54,6 +55,7 @@ const App = () => (
                 }
               >
                 <Route index element={<DashboardPage />} />
+                <Route path="pos" element={<POSPage />} />
                 <Route path="ventas" element={<SalesPage />} />
                 <Route path="compras" element={<PurchasesPage />} />
                 <Route path="inventario" element={<InventoryPage />} />
