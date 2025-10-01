@@ -59,7 +59,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
-        setLoading(true); // Asegurarse de que estamos en estado de carga
         supabase
           .from('profiles')
           .select('*')
@@ -72,7 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             } else {
               setProfile(data);
             }
-            setLoading(false); // Carga terminada
+            setLoading(false);
           });
       } else {
         setProfile(null);

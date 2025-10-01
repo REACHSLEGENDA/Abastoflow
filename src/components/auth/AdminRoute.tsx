@@ -17,11 +17,13 @@ export default function AdminRoute({ children }: AdminRouteProps) {
     );
   }
 
-  // Si no es un admin, lo mandamos a una ruta segura que no cause un bucle.
-  if (!user || !profile || profile.role !== 'admin') {
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  // Si todo está en orden, es un admin y puede ver la página.
+  if (profile?.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   return <>{children}</>;
 }

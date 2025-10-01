@@ -48,7 +48,7 @@ export default function LoginPage() {
       showError(error.message);
     } else {
       showSuccess("¡Bienvenido de vuelta!");
-      navigate("/"); // Ir a la página de inicio y dejar que el enrutador decida
+      navigate("/dashboard");
     }
   }
 
