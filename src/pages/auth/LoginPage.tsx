@@ -13,12 +13,12 @@ import { Link } from "react-router-dom";
 
 export default function LoginPage() {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 dark:bg-gray-900">
-      <Card className="w-full max-w-sm">
-        <CardHeader>
-          <CardTitle className="text-2xl">Iniciar Sesión</CardTitle>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-blue-100 via-white to-blue-100 dark:from-gray-900 dark:via-blue-900/20 dark:to-gray-900">
+      <Card className="w-full max-w-sm bg-white/80 dark:bg-gray-950/80 backdrop-blur-sm shadow-2xl rounded-2xl">
+        <CardHeader className="text-center">
+          <CardTitle className="text-2xl">Bienvenido a AbastoFlow</CardTitle>
           <CardDescription>
-            Ingresa tu correo electrónico para acceder a tu tienda.
+            Ingresa tus credenciales para acceder.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-4">
@@ -32,10 +32,10 @@ export default function LoginPage() {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col">
-          <Button className="w-full">Acceder</Button>
-          <p className="mt-4 text-xs text-center text-gray-700">
+          <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white font-bold shadow-lg">Acceder</Button>
+          <p className="mt-4 text-xs text-center text-gray-700 dark:text-gray-300">
             ¿No tienes una cuenta?{" "}
-            <Link to="/registro" className=" text-blue-600 hover:underline">
+            <Link to="/registro" className=" text-blue-600 hover:underline font-semibold">
               Regístrate
             </Link>
           </p>
