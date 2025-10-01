@@ -7,7 +7,6 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
-import Dashboard from "./pages/Dashboard";
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
 import PublicRoute from "./components/auth/PublicRoute";
@@ -15,6 +14,12 @@ import PendingApprovalPage from "./pages/auth/PendingApprovalPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
 import AdminRoute from "./components/auth/AdminRoute";
+import DashboardLayout from "./components/layout/DashboardLayout";
+import DashboardPage from "./pages/DashboardPage";
+import SalesPage from "./pages/dashboard/SalesPage";
+import InventoryPage from "./pages/dashboard/InventoryPage";
+import SuppliersPage from "./pages/dashboard/SuppliersPage";
+import CustomersPage from "./pages/dashboard/CustomersPage";
 
 const queryClient = new QueryClient();
 
@@ -33,14 +38,22 @@ const App = () => (
             
             {/* Rutas de Autenticación de Usuario */}
             <Route path="/pending-approval" element={<PendingApprovalPage />} />
+            
+            {/* Rutas del Dashboard (Protegidas y con Layout) */}
             <Route 
               path="/dashboard" 
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <DashboardLayout />
                 </ProtectedRoute>
-              } 
-            />
+              }
+            >
+              <Route index element={<DashboardPage />} />
+              <Route path="ventas" element={<SalesPage />} />
+              <Route path="inventario" element={<InventoryPage />} />
+              <Route path="proveedores" element={<SuppliersPage />} />
+              <Route path="clientes" element={<CustomersPage />} />
+            </Route>
 
             {/* Rutas de Administración */}
             <Route path="/admin/login" element={<AdminLoginPage />} />
