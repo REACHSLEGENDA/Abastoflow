@@ -24,6 +24,7 @@ import ReportsPage from "./pages/dashboard/ReportsPage";
 import ProfilePage from "./pages/dashboard/ProfilePage";
 import { ThemeProvider } from "./components/theme-provider";
 import SettingsPage from "./pages/dashboard/SettingsPage";
+import TeamPage from "./pages/dashboard/TeamPage";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
                 <Route path="inventario" element={<InventoryPage />} />
                 <Route path="proveedores" element={<SuppliersPage />} />
                 <Route path="reportes" element={<ReportsPage />} />
+                <Route path="equipo" element={<TeamPage />} />
                 <Route path="perfil" element={<ProfilePage />} />
                 <Route path="ajustes" element={<SettingsPage />} />
               </Route>
