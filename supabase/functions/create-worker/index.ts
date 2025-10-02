@@ -1,3 +1,4 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 import { corsHeaders } from '../_shared/cors.ts'
 
@@ -30,20 +31,28 @@ serve(async (req) => {
 
     const newUserId = authData.user.id
 
-    // 2. Crear el perfil del nuevo usuario en la tabla 'profiles'
-    const { error: profileError } = await supabaseAdmin
+    // 2. Obtener el nombre del comercio del jefe para heredarlo
+    const { data: profileData, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .select('commerce_name')
+      .eq('id', jefe_id)
+      .single()
+    
+    if (profileError) throw profileError
+
+    // 3. Crear el perfil del nuevo usuario en la tabla 'profiles'
+    const { error: insertProfileError } = await supabaseAdmin
       .from('profiles')
       .insert({
         id: newUserId,
         full_name: worker_full_name,
         role: 'cajero',
-        // Heredar el nombre del comercio del jefe
-        commerce_name: (await supabaseAdmin.from('profiles').select('commerce_name').eq('id', jefe_id).single()).data.commerce_name
+        commerce_name: profileData.commerce_name
       })
 
-    if (profileError) throw profileError
+    if (insertProfileError) throw insertProfileError
 
-    // 3. Actualizar el estado de la solicitud a 'approved'
+    // 4. Actualizar el estado de la solicitud a 'approved'
     const { error: requestError } = await supabaseAdmin
       .from('worker_requests')
       .update({ status: 'approved' })
