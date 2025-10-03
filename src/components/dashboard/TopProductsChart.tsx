@@ -23,8 +23,9 @@ export default function TopProductsChart() {
 
       const productSales: { [key: string]: number } = {};
       saleItems.forEach(item => {
-        if (item.products) {
-          const productName = item.products.name;
+        // The Supabase client returns the joined 'products' as an array, so we access the first element.
+        if (item.products && item.products[0]?.name) {
+          const productName = item.products[0].name;
           productSales[productName] = (productSales[productName] || 0) + item.quantity;
         }
       });
