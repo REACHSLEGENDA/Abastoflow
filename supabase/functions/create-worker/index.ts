@@ -23,7 +23,8 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // 1. Crear el nuevo usuario en Supabase Auth
+    // 1. Crear el nuevo usuario en Supabase Auth. Esto disparará el trigger 'handle_new_user'
+    // que crea un perfil básico con rol 'pendiente'.
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: worker_email,
       password: worker_temp_password,
@@ -44,29 +45,25 @@ serve(async (req) => {
       .eq('id', jefe_id)
       .single()
     
-    if (profileError) {
+    if (profileError || !profileData) {
+      // Si falla, limpiar el usuario recién creado para no dejar datos huérfanos.
       await supabaseAdmin.auth.admin.deleteUser(newUserId);
-      throw profileError;
-    }
-    
-    if (!profileData) {
-      await supabaseAdmin.auth.admin.deleteUser(newUserId);
-      throw new Error(`No se encontró el perfil para el jefe con ID: ${jefe_id}`);
+      throw profileError || new Error(`No se encontró el perfil para el jefe con ID: ${jefe_id}`);
     }
 
-    // 3. Crear el perfil del nuevo usuario en la tabla 'profiles'
-    const { error: insertProfileError } = await supabaseAdmin
+    // 3. ACTUALIZAR el perfil que el trigger ya creó.
+    const { error: updateProfileError } = await supabaseAdmin
       .from('profiles')
-      .insert({
-        id: newUserId,
-        full_name: worker_full_name,
+      .update({
         role: 'cajero',
         commerce_name: profileData.commerce_name
       })
+      .eq('id', newUserId)
 
-    if (insertProfileError) {
+    if (updateProfileError) {
+      // Si falla la actualización, limpiar el usuario.
       await supabaseAdmin.auth.admin.deleteUser(newUserId);
-      throw insertProfileError;
+      throw updateProfileError;
     }
 
     // 4. Actualizar el estado de la solicitud a 'approved'
@@ -76,10 +73,11 @@ serve(async (req) => {
       .eq('id', request_id)
 
     if (requestError) {
+      // Este es un problema menor, pero lo registramos. El usuario ya está creado.
       console.warn(`No se pudo actualizar el estado de la solicitud ${request_id}: ${requestError.message}`);
     }
 
-    return new Response(JSON.stringify({ message: 'Trabajador creado con éxito' }), {
+    return new Response(JSON.stringify({ message: 'Trabajador creado y aprobado con éxito' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 200,
     })
