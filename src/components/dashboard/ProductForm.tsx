@@ -26,6 +26,7 @@ import { useEffect } from "react";
 
 const productSchema = z.object({
   name: z.string().min(1, "El nombre es requerido."),
+  category: z.string().optional(),
   sku: z.string().optional(),
   description: z.string().optional(),
   sale_price: z.coerce.number().min(0, "El precio debe ser positivo."),
@@ -48,6 +49,7 @@ export default function ProductForm({ isOpen, setIsOpen, onSuccess, productToEdi
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: "",
+      category: "",
       sku: "",
       description: "",
       sale_price: 0,
@@ -65,6 +67,7 @@ export default function ProductForm({ isOpen, setIsOpen, onSuccess, productToEdi
     } else {
       form.reset({
         name: "",
+        category: "",
         sku: "",
         description: "",
         sale_price: 0,
@@ -110,19 +113,34 @@ export default function ProductForm({ isOpen, setIsOpen, onSuccess, productToEdi
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nombre del Producto</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ej: Coca-Cola 600ml" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nombre del Producto</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej: Coca-Cola 600ml" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Categoría (Opcional)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ej: Refrescos, Botanas" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
               name="description"
