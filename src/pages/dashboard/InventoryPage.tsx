@@ -31,11 +31,13 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
 import { showError, showSuccess } from "@/utils/toast";
 import ProductForm from "@/components/dashboard/ProductForm";
 import CategoryForm from "@/components/dashboard/CategoryForm";
 import { Badge } from "@/components/ui/badge";
+import { useSearchParams } from "react-router-dom";
 
 export default function InventoryPage() {
   const [products, setProducts] = useState<any[]>([]);
@@ -46,6 +48,8 @@ export default function InventoryPage() {
   const [productToEdit, setProductToEdit] = useState<any | null>(null);
   const [productToDelete, setProductToDelete] = useState<any | null>(null);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const [searchParams] = useSearchParams();
+  const defaultTab = searchParams.get("view") === "low-stock" ? "low-stock" : "all";
 
   async function fetchProducts() {
     setLoading(true);
@@ -99,6 +103,10 @@ export default function InventoryPage() {
     setProductToDelete(null);
   };
 
+  const lowStockProducts = products.filter(
+    p => p.min_stock_alert > 0 && p.current_stock <= p.min_stock_alert
+  );
+
   return (
     <div>
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
@@ -118,93 +126,105 @@ export default function InventoryPage() {
         </div>
       </div>
 
-      {loading ? (
-        <p>Cargando productos...</p>
-      ) : products.length === 0 ? (
-        <div className="text-center py-16 border rounded-lg">
-          <p>No has agregado ningún producto todavía.</p>
-        </div>
-      ) : (
-        <Accordion type="single" collapsible className="w-full" defaultValue={Object.keys(groupedProducts)[0]}>
-          {Object.entries(groupedProducts).map(([category, productsInCategory]) => (
-            <AccordionItem value={category} key={category}>
-              <AccordionTrigger className="text-lg font-medium">
-                <div className="flex items-center gap-3">
-                  {category}
-                  <Badge variant="secondary">{productsInCategory.length}</Badge>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div className="rounded-lg border shadow-sm">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Nombre</TableHead>
-                        <TableHead>SKU</TableHead>
-                        <TableHead className="text-right">Precio Venta</TableHead>
-                        <TableHead className="text-right">Stock</TableHead>
-                        <TableHead className="w-[50px]"></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {productsInCategory.map((product) => (
-                        <TableRow key={product.id}>
-                          <TableCell className="font-medium">{product.name}</TableCell>
-                          <TableCell>{product.sku || "-"}</TableCell>
-                          <TableCell className="text-right">${product.sale_price.toFixed(2)}</TableCell>
-                          <TableCell className="text-right">{product.current_stock}</TableCell>
-                          <TableCell>
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                  <span className="sr-only">Abrir menú</span>
-                                  <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => handleEditProduct(product)}>
-                                  Editar
-                                </DropdownMenuItem>
-                                <DropdownMenuItem
-                                  className="text-red-600"
-                                  onClick={() => handleDeleteProduct(product)}
-                                >
-                                  Eliminar
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-      )}
+      <Tabs defaultValue={defaultTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2 sm:w-[400px]">
+          <TabsTrigger value="all">Todos los Productos</TabsTrigger>
+          <TabsTrigger value="low-stock">
+            <div className="flex items-center gap-2">
+              Stock Bajo
+              {lowStockProducts.length > 0 && (
+                <Badge variant="destructive">{lowStockProducts.length}</Badge>
+              )}
+            </div>
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="all" className="mt-4">
+          {loading ? <p>Cargando...</p> : products.length === 0 ? (
+            <div className="text-center py-16 border rounded-lg">
+              <p>No has agregado ningún producto todavía.</p>
+            </div>
+          ) : (
+            <Accordion type="single" collapsible className="w-full" defaultValue={Object.keys(groupedProducts)[0]}>
+              {Object.entries(groupedProducts).map(([category, productsInCategory]) => (
+                <AccordionItem value={category} key={category}>
+                  <AccordionTrigger className="text-lg font-medium">
+                    <div className="flex items-center gap-3">{category}<Badge variant="secondary">{productsInCategory.length}</Badge></div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div className="rounded-lg border shadow-sm">
+                      <Table>
+                        <TableHeader><TableRow><TableHead>Nombre</TableHead><TableHead>SKU</TableHead><TableHead className="text-right">Precio Venta</TableHead><TableHead className="text-right">Stock</TableHead><TableHead className="w-[50px]"></TableHead></TableRow></TableHeader>
+                        <TableBody>
+                          {productsInCategory.map((product) => (
+                            <TableRow key={product.id}>
+                              <TableCell className="font-medium">{product.name}</TableCell>
+                              <TableCell>{product.sku || "-"}</TableCell>
+                              <TableCell className="text-right">${product.sale_price.toFixed(2)}</TableCell>
+                              <TableCell className="text-right">{product.current_stock}</TableCell>
+                              <TableCell>
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><span className="sr-only">Abrir menú</span><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem onClick={() => handleEditProduct(product)}>Editar</DropdownMenuItem>
+                                    <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteProduct(product)}>Eliminar</DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          )}
+        </TabsContent>
+        <TabsContent value="low-stock" className="mt-4">
+          <div className="rounded-lg border shadow-sm">
+            <Table>
+              <TableHeader><TableRow><TableHead>Producto</TableHead><TableHead>Categoría</TableHead><TableHead className="text-right">Stock Actual / Mínimo</TableHead><TableHead className="w-[50px]"></TableHead></TableRow></TableHeader>
+              <TableBody>
+                {loading ? <TableRow><TableCell colSpan={4} className="text-center h-24">Cargando...</TableCell></TableRow> :
+                 lowStockProducts.length === 0 ? (
+                  <TableRow><TableCell colSpan={4} className="text-center h-24">¡Todo en orden! No hay productos con stock bajo.</TableCell></TableRow>
+                 ) : (
+                  lowStockProducts.map((product) => (
+                    <TableRow key={product.id}>
+                      <TableCell className="font-medium">{product.name}</TableCell>
+                      <TableCell>{product.category?.name || 'N/A'}</TableCell>
+                      <TableCell className="text-right">
+                        <Badge variant={product.current_stock === 0 ? "destructive" : "secondary"}>
+                          {product.current_stock} / {product.min_stock_alert}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild><Button variant="ghost" className="h-8 w-8 p-0"><span className="sr-only">Abrir menú</span><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={() => handleEditProduct(product)}>Editar</DropdownMenuItem>
+                            <DropdownMenuItem className="text-red-600" onClick={() => handleDeleteProduct(product)}>Eliminar</DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                 )}
+              </TableBody>
+            </Table>
+          </div>
+        </TabsContent>
+      </Tabs>
 
-      <ProductForm
-        isOpen={isFormOpen}
-        setIsOpen={setIsFormOpen}
-        onSuccess={fetchProducts}
-        productToEdit={productToEdit}
-      />
-
-      <CategoryForm
-        isOpen={isCategoryFormOpen}
-        setIsOpen={setIsCategoryFormOpen}
-        onSuccess={fetchProducts}
-      />
-
+      <ProductForm isOpen={isFormOpen} setIsOpen={setIsFormOpen} onSuccess={fetchProducts} productToEdit={productToEdit} />
+      <CategoryForm isOpen={isCategoryFormOpen} setIsOpen={setIsCategoryFormOpen} onSuccess={fetchProducts} />
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>¿Estás seguro?</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Se eliminará permanentemente el producto
-              "{productToDelete?.name}" de tu inventario.
+              Esta acción no se puede deshacer. Se eliminará permanentemente el producto "{productToDelete?.name}" de tu inventario.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

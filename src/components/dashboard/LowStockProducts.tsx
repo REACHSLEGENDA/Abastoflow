@@ -42,7 +42,7 @@ export default function LowStockProducts() {
           <CardDescription>Productos que requieren tu atención inmediata.</CardDescription>
         </div>
         <Button asChild size="sm" className="ml-auto gap-1">
-          <Link to="/dashboard/inventario">
+          <Link to="/dashboard/inventario?view=low-stock">
             Ver Todos
             <ArrowUpRight className="h-4 w-4" />
           </Link>
