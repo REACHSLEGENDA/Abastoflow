@@ -101,17 +101,17 @@ export default function InventoryPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
           <h1 className="text-2xl font-bold">Gestión de Inventario</h1>
           <p className="text-muted-foreground">Controla tu stock de productos por categorías.</p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={() => setIsCategoryFormOpen(true)}>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button variant="outline" onClick={() => setIsCategoryFormOpen(true)} className="flex-1 sm:flex-initial">
             <PlusCircle className="mr-2 h-4 w-4" />
             Agregar Categoría
           </Button>
-          <Button onClick={handleAddProduct}>
+          <Button onClick={handleAddProduct} className="flex-1 sm:flex-initial">
             <PlusCircle className="mr-2 h-4 w-4" />
             Agregar Producto
           </Button>

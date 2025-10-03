@@ -30,6 +30,8 @@ import { Button } from "@/components/ui/button";
 import { showError, showSuccess } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
 import { Trash2 } from "lucide-react";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 
 export default function AdminDashboardPage() {
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
@@ -86,17 +88,19 @@ export default function AdminDashboardPage() {
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-8">
       <div className="max-w-7xl mx-auto space-y-8">
-        <header className="flex justify-between items-center">
+        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
             <h1 className="text-3xl font-bold">Panel de Administración</h1>
             <p className="text-gray-500 dark:text-gray-400">Gestión de usuarios</p>
           </div>
-          <Button onClick={handleLogout} variant="outline">Cerrar Sesión</Button>
+          <Button onClick={handleLogout} variant="outline" className="w-full sm:w-auto">Cerrar Sesión</Button>
         </header>
         
         <section>
           <h2 className="text-2xl font-semibold mb-4">Gestión de Usuarios</h2>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+          
+          {/* Desktop Table */}
+          <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -132,6 +136,38 @@ export default function AdminDashboardPage() {
                  ))}
               </TableBody>
             </Table>
+          </div>
+
+          {/* Mobile Cards */}
+          <div className="md:hidden space-y-4">
+            {loading ? <p className="text-center">Cargando...</p> : profiles.map((profile) => (
+              <Card key={profile.id} className="bg-white dark:bg-gray-800">
+                <CardHeader>
+                  <CardTitle>{profile.full_name}</CardTitle>
+                  <CardDescription>{profile.commerce_name}</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label>Rol</Label>
+                    <Select defaultValue={profile.role} onValueChange={(newRole) => handleRoleChange(profile.id, newRole)}>
+                      <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="aprobado">Aprobado</SelectItem>
+                        <SelectItem value="cajero">Cajero</SelectItem>
+                        <SelectItem value="pendiente">Pendiente</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Button variant="destructive" size="sm" onClick={() => setUserToDelete(profile)} className="w-full">
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Eliminar
+                  </Button>
+                </CardFooter>
+              </Card>
+            ))}
           </div>
         </section>
       </div>

@@ -7,6 +7,7 @@ import CurrentSale from "@/components/pos/CurrentSale";
 import { showError } from "@/utils/toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Badge } from "@/components/ui/badge";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export interface CartItem {
   product_id: string;
@@ -21,6 +22,7 @@ export default function SalesPage() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [salesHistory, setSalesHistory] = useState<any[]>([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const isMobile = useIsMobile();
 
   async function fetchSalesHistory() {
     setLoadingHistory(true);
@@ -117,7 +119,10 @@ export default function SalesPage() {
       </div>
       
       <TabsContent value="pos" className="flex-grow">
-        <ResizablePanelGroup direction="horizontal" className="h-[calc(100vh-150px)] rounded-lg border">
+        <ResizablePanelGroup 
+          direction={isMobile ? "vertical" : "horizontal"} 
+          className="rounded-lg border min-h-[600px]"
+        >
           <ResizablePanel defaultSize={60}>
             <ProductSelection onProductSelect={addToCart} />
           </ResizablePanel>

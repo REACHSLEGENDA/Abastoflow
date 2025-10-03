@@ -51,12 +51,12 @@ export default function PurchasesPage() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
         <div>
           <h1 className="text-2xl font-bold">Gestión de Compras</h1>
           <p className="text-muted-foreground">Registra las compras de tus proveedores.</p>
         </div>
-        <Button onClick={handleAddPurchase}>
+        <Button onClick={handleAddPurchase} className="w-full sm:w-auto">
           <PlusCircle className="mr-2 h-4 w-4" />
           Registrar Compra
         </Button>
