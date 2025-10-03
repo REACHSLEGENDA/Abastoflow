@@ -80,7 +80,9 @@ export default function AdminDashboardPage() {
         }
       });
       if (error) {
-        showError(`Error al aprobar: ${error.message}`);
+        const errorBody = await error.context?.json().catch(() => null);
+        const detailedError = errorBody?.error || error.message;
+        showError(`Error al aprobar: ${detailedError}`);
       } else {
         showSuccess("Solicitud aprobada y trabajador creado.");
       }

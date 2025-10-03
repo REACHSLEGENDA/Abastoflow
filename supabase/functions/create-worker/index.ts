@@ -23,7 +23,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // 1. Obtener el nombre del comercio del jefe ANTES de crear el usuario.
+    // 1. Obtener el nombre del comercio del jefe.
     const { data: profileData, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('commerce_name')
@@ -34,8 +34,7 @@ serve(async (req) => {
       throw profileError || new Error(`No se encontró el perfil para el jefe con ID: ${jefe_id}`);
     }
 
-    // 2. Crear el nuevo usuario en Supabase Auth, pasando todos los datos necesarios
-    // para que el trigger 'handle_new_user' cree el perfil completo.
+    // 2. Intentar crear el nuevo usuario.
     const { error: authError } = await supabaseAdmin.auth.admin.createUser({
       email: worker_email,
       password: worker_temp_password,
@@ -43,11 +42,15 @@ serve(async (req) => {
       user_metadata: {
         full_name: worker_full_name,
         commerce_name: profileData.commerce_name,
-        role: 'cajero' // El trigger usará este rol
+        role: 'cajero'
       }
     })
 
-    if (authError) throw authError
+    // Si el error es que el usuario ya existe ("User already registered"), lo ignoramos y continuamos.
+    // Si es cualquier otro error, lo lanzamos para que falle la función.
+    if (authError && !authError.message.includes('User already registered')) {
+      throw authError
+    }
 
     // 3. Actualizar el estado de la solicitud a 'approved'
     const { error: requestError } = await supabaseAdmin
@@ -56,8 +59,7 @@ serve(async (req) => {
       .eq('id', request_id)
 
     if (requestError) {
-      // Este es un problema menor, pero lo registramos. El usuario ya está creado.
-      console.warn(`No se pudo actualizar el estado de la solicitud ${request_id}: ${requestError.message}`);
+      console.error(`Error al actualizar la solicitud ${request_id}: ${requestError.message}`);
     }
 
     return new Response(JSON.stringify({ message: 'Trabajador creado y aprobado con éxito' }), {
@@ -65,6 +67,7 @@ serve(async (req) => {
       status: 200,
     })
   } catch (error) {
+    // Devolvemos el mensaje de error real para un mejor diagnóstico en el cliente.
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
