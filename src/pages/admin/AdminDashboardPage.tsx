@@ -29,12 +29,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { showError, showSuccess } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
-import { Badge } from "@/components/ui/badge";
 import { Trash2 } from "lucide-react";
 
 export default function AdminDashboardPage() {
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
-  const [requests, setRequests] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [userToDelete, setUserToDelete] = useState<UserProfile | null>(null);
   const { signOut } = useAuth();
@@ -43,13 +41,11 @@ export default function AdminDashboardPage() {
   async function fetchData() {
     setLoading(true);
     const { data: profilesData, error: profilesError } = await supabase.from("profiles").select("*");
-    const { data: requestsData, error: requestsError } = await supabase.from("worker_requests").select("*").eq('status', 'pending');
 
-    if (profilesError || requestsError) {
-      showError("Error al cargar los datos: " + (profilesError?.message || requestsError?.message));
+    if (profilesError) {
+      showError("Error al cargar los datos: " + profilesError.message);
     } else {
       setProfiles(profilesData || []);
-      setRequests(requestsData || []);
     }
     setLoading(false);
   }
@@ -66,35 +62,6 @@ export default function AdminDashboardPage() {
       showSuccess("Rol actualizado correctamente.");
       fetchData();
     }
-  };
-
-  const handleRequest = async (request: any, newStatus: 'approved' | 'rejected') => {
-    if (newStatus === 'approved') {
-      const { error } = await supabase.functions.invoke('create-worker', {
-        body: {
-          request_id: request.id,
-          worker_email: request.worker_email,
-          worker_temp_password: request.worker_temp_password,
-          worker_full_name: request.worker_full_name,
-          jefe_id: request.jefe_id,
-        }
-      });
-      if (error) {
-        const errorBody = await error.context?.json().catch(() => null);
-        const detailedError = errorBody?.error || error.message;
-        showError(`Error al aprobar: ${detailedError}`);
-      } else {
-        showSuccess("Solicitud aprobada y trabajador creado.");
-      }
-    } else { // rejected
-      const { error } = await supabase.from('worker_requests').update({ status: 'rejected' }).eq('id', request.id);
-      if (error) {
-        showError(`Error al rechazar: ${error.message}`);
-      } else {
-        showSuccess("Solicitud rechazada.");
-      }
-    }
-    fetchData();
   };
 
   const handleDeleteUser = async () => {
@@ -122,40 +89,11 @@ export default function AdminDashboardPage() {
         <header className="flex justify-between items-center">
           <div>
             <h1 className="text-3xl font-bold">Panel de Administración</h1>
-            <p className="text-gray-500 dark:text-gray-400">Gestión de usuarios y solicitudes</p>
+            <p className="text-gray-500 dark:text-gray-400">Gestión de usuarios</p>
           </div>
           <Button onClick={handleLogout} variant="outline">Cerrar Sesión</Button>
         </header>
         
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">Solicitudes de Trabajadores Pendientes</h2>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nombre del Solicitante</TableHead>
-                  <TableHead>Email del Nuevo Cajero</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? <TableRow><TableCell colSpan={3} className="text-center">Cargando...</TableCell></TableRow> :
-                 requests.length === 0 ? <TableRow><TableCell colSpan={3} className="text-center">No hay solicitudes pendientes.</TableCell></TableRow> :
-                 requests.map((req) => (
-                  <TableRow key={req.id}>
-                    <TableCell>{profiles.find(p => p.id === req.jefe_id)?.full_name || 'Desconocido'}</TableCell>
-                    <TableCell>{req.worker_email}</TableCell>
-                    <TableCell className="text-right space-x-2">
-                      <Button size="sm" onClick={() => handleRequest(req, 'approved')}>Aprobar</Button>
-                      <Button size="sm" variant="destructive" onClick={() => handleRequest(req, 'rejected')}>Rechazar</Button>
-                    </TableCell>
-                  </TableRow>
-                 ))}
-              </TableBody>
-            </Table>
-          </div>
-        </section>
-
         <section>
           <h2 className="text-2xl font-semibold mb-4">Gestión de Usuarios</h2>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">

@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet, useLocation, Navigate } from "react-router-dom";
-import { Home, ShoppingCart, Truck, Receipt, BarChart3, Users } from "lucide-react";
+import { Home, ShoppingCart, Truck, Receipt, BarChart3 } from "lucide-react";
 import { UserNav } from "@/components/layout/UserNav";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -52,10 +52,6 @@ const Sidebar = () => {
                 <NavLink to="/dashboard/reportes" className={navLinkClass}>
                   <BarChart3 className="h-4 w-4" />
                   Reportes
-                </NavLink>
-                <NavLink to="/dashboard/equipo" className={navLinkClass}>
-                  <Users className="h-4 w-4" />
-                  Equipo
                 </NavLink>
               </>
             )}
