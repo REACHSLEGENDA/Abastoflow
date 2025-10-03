@@ -23,22 +23,7 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    // 1. Crear el nuevo usuario en Supabase Auth. Esto disparará el trigger 'handle_new_user'
-    // que crea un perfil básico con rol 'pendiente'.
-    const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-      email: worker_email,
-      password: worker_temp_password,
-      email_confirm: true,
-      user_metadata: {
-        full_name: worker_full_name,
-      }
-    })
-
-    if (authError) throw authError
-
-    const newUserId = authData.user.id
-
-    // 2. Obtener el nombre del comercio del jefe para heredarlo
+    // 1. Obtener el nombre del comercio del jefe ANTES de crear el usuario.
     const { data: profileData, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('commerce_name')
@@ -46,27 +31,25 @@ serve(async (req) => {
       .single()
     
     if (profileError || !profileData) {
-      // Si falla, limpiar el usuario recién creado para no dejar datos huérfanos.
-      await supabaseAdmin.auth.admin.deleteUser(newUserId);
       throw profileError || new Error(`No se encontró el perfil para el jefe con ID: ${jefe_id}`);
     }
 
-    // 3. ACTUALIZAR el perfil que el trigger ya creó.
-    const { error: updateProfileError } = await supabaseAdmin
-      .from('profiles')
-      .update({
-        role: 'cajero',
-        commerce_name: profileData.commerce_name
-      })
-      .eq('id', newUserId)
+    // 2. Crear el nuevo usuario en Supabase Auth, pasando todos los datos necesarios
+    // para que el trigger 'handle_new_user' cree el perfil completo.
+    const { error: authError } = await supabaseAdmin.auth.admin.createUser({
+      email: worker_email,
+      password: worker_temp_password,
+      email_confirm: true,
+      user_metadata: {
+        full_name: worker_full_name,
+        commerce_name: profileData.commerce_name,
+        role: 'cajero' // El trigger usará este rol
+      }
+    })
 
-    if (updateProfileError) {
-      // Si falla la actualización, limpiar el usuario.
-      await supabaseAdmin.auth.admin.deleteUser(newUserId);
-      throw updateProfileError;
-    }
+    if (authError) throw authError
 
-    // 4. Actualizar el estado de la solicitud a 'approved'
+    // 3. Actualizar el estado de la solicitud a 'approved'
     const { error: requestError } = await supabaseAdmin
       .from('worker_requests')
       .update({ status: 'approved' })
