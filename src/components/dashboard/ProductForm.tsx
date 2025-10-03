@@ -21,12 +21,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { showError, showSuccess } from "@/utils/toast";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const productSchema = z.object({
   name: z.string().min(1, "El nombre es requerido."),
-  category: z.string().optional(),
+  category_id: z.string().uuid("Debes seleccionar una categoría."),
   sku: z.string().optional(),
   description: z.string().optional(),
   sale_price: z.coerce.number().min(0, "El precio debe ser positivo."),
@@ -45,11 +46,11 @@ interface ProductFormProps {
 }
 
 export default function ProductForm({ isOpen, setIsOpen, onSuccess, productToEdit }: ProductFormProps) {
+  const [categories, setCategories] = useState<any[]>([]);
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     defaultValues: {
       name: "",
-      category: "",
       sku: "",
       description: "",
       sale_price: 0,
@@ -59,6 +60,20 @@ export default function ProductForm({ isOpen, setIsOpen, onSuccess, productToEdi
     },
   });
 
+  useEffect(() => {
+    async function fetchCategories() {
+      const { data, error } = await supabase.from("categories").select("id, name");
+      if (error) {
+        showError("No se pudieron cargar las categorías.");
+      } else {
+        setCategories(data || []);
+      }
+    }
+    if (isOpen) {
+      fetchCategories();
+    }
+  }, [isOpen]);
+
   const isEditing = !!productToEdit;
 
   useEffect(() => {
@@ -67,7 +82,7 @@ export default function ProductForm({ isOpen, setIsOpen, onSuccess, productToEdi
     } else {
       form.reset({
         name: "",
-        category: "",
+        category_id: undefined,
         sku: "",
         description: "",
         sale_price: 0,
@@ -129,13 +144,22 @@ export default function ProductForm({ isOpen, setIsOpen, onSuccess, productToEdi
               />
               <FormField
                 control={form.control}
-                name="category"
+                name="category_id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Categoría (Opcional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej: Refrescos, Botanas" {...field} />
-                    </FormControl>
+                    <FormLabel>Categoría</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecciona una categoría" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {categories.map(cat => (
+                          <SelectItem key={cat.id} value={cat.id}>{cat.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}

@@ -34,6 +34,7 @@ import {
 import { MoreHorizontal, PlusCircle } from "lucide-react";
 import { showError, showSuccess } from "@/utils/toast";
 import ProductForm from "@/components/dashboard/ProductForm";
+import CategoryForm from "@/components/dashboard/CategoryForm";
 import { Badge } from "@/components/ui/badge";
 
 export default function InventoryPage() {
@@ -41,23 +42,24 @@ export default function InventoryPage() {
   const [groupedProducts, setGroupedProducts] = useState<Record<string, any[]>>({});
   const [loading, setLoading] = useState(true);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [isCategoryFormOpen, setIsCategoryFormOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState<any | null>(null);
   const [productToDelete, setProductToDelete] = useState<any | null>(null);
   const [isAlertOpen, setIsAlertOpen] = useState(false);
 
   async function fetchProducts() {
     setLoading(true);
-    const { data, error } = await supabase.from("products").select("*").order("name");
+    const { data, error } = await supabase.from("products").select("*, category:categories(name)").order("name");
     if (error) {
       showError("Error al cargar los productos: " + error.message);
     } else {
       setProducts(data || []);
       const grouped = (data || []).reduce((acc, product) => {
-        const category = product.category || 'Sin Categoría';
-        if (!acc[category]) {
-          acc[category] = [];
+        const categoryName = product.category?.name || 'Sin Categoría';
+        if (!acc[categoryName]) {
+          acc[categoryName] = [];
         }
-        acc[category].push(product);
+        acc[categoryName].push(product);
         return acc;
       }, {} as Record<string, any[]>);
       setGroupedProducts(grouped);
@@ -104,10 +106,16 @@ export default function InventoryPage() {
           <h1 className="text-2xl font-bold">Gestión de Inventario</h1>
           <p className="text-muted-foreground">Controla tu stock de productos por categorías.</p>
         </div>
-        <Button onClick={handleAddProduct}>
-          <PlusCircle className="mr-2 h-4 w-4" />
-          Agregar Producto
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setIsCategoryFormOpen(true)}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Agregar Categoría
+          </Button>
+          <Button onClick={handleAddProduct}>
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Agregar Producto
+          </Button>
+        </div>
       </div>
 
       {loading ? (
@@ -182,6 +190,12 @@ export default function InventoryPage() {
         setIsOpen={setIsFormOpen}
         onSuccess={fetchProducts}
         productToEdit={productToEdit}
+      />
+
+      <CategoryForm
+        isOpen={isCategoryFormOpen}
+        setIsOpen={setIsCategoryFormOpen}
+        onSuccess={fetchProducts}
       />
 
       <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
