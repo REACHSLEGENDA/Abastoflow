@@ -29,12 +29,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { showError, showSuccess } from "@/utils/toast";
 import { useNavigate } from "react-router-dom";
-import { Trash2 } from "lucide-react";
+import { Trash2, LogOut, Users, UserCheck, UserClock } from "lucide-react";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 
 export default function AdminDashboardPage() {
   const [profiles, setProfiles] = useState<UserProfile[]>([]);
+  const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0 });
   const [loading, setLoading] = useState(true);
   const [userToDelete, setUserToDelete] = useState<UserProfile | null>(null);
   const { signOut } = useAuth();
@@ -48,6 +49,10 @@ export default function AdminDashboardPage() {
       showError("Error al cargar los datos: " + profilesError.message);
     } else {
       setProfiles(profilesData || []);
+      const total = profilesData?.length || 0;
+      const pending = profilesData?.filter(p => p.role === 'pendiente').length || 0;
+      const approved = profilesData?.filter(p => p.role === 'aprobado').length || 0;
+      setStats({ total, pending, approved });
     }
     setLoading(false);
   }
@@ -86,39 +91,110 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-4 sm:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold">Panel de Administración</h1>
-            <p className="text-gray-500 dark:text-gray-400">Gestión de usuarios</p>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+      <header className="bg-white dark:bg-gray-900/50 border-b border-gray-200 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center gap-4">
+              <img src="/logo.png" alt="AbastoFlow" className="h-8 w-auto" />
+              <h1 className="text-xl font-semibold text-gray-800 dark:text-gray-200">Panel de Administración</h1>
+            </div>
+            <Button onClick={handleLogout} variant="ghost" size="sm">
+              <LogOut className="mr-2 h-4 w-4" />
+              Cerrar Sesión
+            </Button>
           </div>
-          <Button onClick={handleLogout} variant="outline" className="w-full sm:w-auto">Cerrar Sesión</Button>
-        </header>
-        
-        <section>
-          <h2 className="text-2xl font-semibold mb-4">Gestión de Usuarios</h2>
-          
-          {/* Desktop Table */}
-          <div className="hidden md:block bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Nombre</TableHead>
-                  <TableHead>Comercio</TableHead>
-                  <TableHead>Rol</TableHead>
-                  <TableHead className="text-right">Acciones</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? <TableRow><TableCell colSpan={4} className="text-center">Cargando...</TableCell></TableRow> :
-                 profiles.map((profile) => (
-                  <TableRow key={profile.id}>
-                    <TableCell className="font-medium">{profile.full_name}</TableCell>
-                    <TableCell>{profile.commerce_name}</TableCell>
-                    <TableCell>
+        </div>
+      </header>
+
+      <main className="p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto space-y-8">
+          {/* Stats Cards */}
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total de Usuarios</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.total}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Usuarios Pendientes</CardTitle>
+                <UserClock className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.pending}</div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Usuarios Aprobados</CardTitle>
+                <UserCheck className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stats.approved}</div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* User Management Table */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Gestión de Usuarios</CardTitle>
+              <CardDescription>Modifica roles y administra el acceso de los usuarios a la plataforma.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="hidden md:block rounded-md border">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Nombre</TableHead>
+                      <TableHead>Comercio</TableHead>
+                      <TableHead>Rol</TableHead>
+                      <TableHead className="text-right">Acciones</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loading ? <TableRow><TableCell colSpan={4} className="text-center h-24">Cargando...</TableCell></TableRow> :
+                     profiles.map((profile) => (
+                      <TableRow key={profile.id}>
+                        <TableCell className="font-medium">{profile.full_name}</TableCell>
+                        <TableCell>{profile.commerce_name}</TableCell>
+                        <TableCell>
+                          <Select defaultValue={profile.role} onValueChange={(newRole) => handleRoleChange(profile.id, newRole)}>
+                            <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="aprobado">Aprobado</SelectItem>
+                              <SelectItem value="cajero">Cajero</SelectItem>
+                              <SelectItem value="pendiente">Pendiente</SelectItem>
+                              <SelectItem value="admin">Admin</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" onClick={() => setUserToDelete(profile)}>
+                            <Trash2 className="h-4 w-4 text-red-500" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                     ))}
+                  </TableBody>
+                </Table>
+              </div>
+              <div className="md:hidden space-y-4">
+                {loading ? <p className="text-center">Cargando...</p> : profiles.map((profile) => (
+                  <Card key={profile.id} className="bg-white dark:bg-gray-800/50">
+                    <CardHeader>
+                      <CardTitle>{profile.full_name}</CardTitle>
+                      <CardDescription>{profile.commerce_name}</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Label>Rol</Label>
                       <Select defaultValue={profile.role} onValueChange={(newRole) => handleRoleChange(profile.id, newRole)}>
-                        <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+                        <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
                         <SelectContent>
                           <SelectItem value="aprobado">Aprobado</SelectItem>
                           <SelectItem value="cajero">Cajero</SelectItem>
@@ -126,51 +202,20 @@ export default function AdminDashboardPage() {
                           <SelectItem value="admin">Admin</SelectItem>
                         </SelectContent>
                       </Select>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button variant="destructive" size="icon" onClick={() => setUserToDelete(profile)}>
-                        <Trash2 className="h-4 w-4" />
+                    </CardContent>
+                    <CardFooter>
+                      <Button variant="destructive" size="sm" onClick={() => setUserToDelete(profile)} className="w-full">
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Eliminar Usuario
                       </Button>
-                    </TableCell>
-                  </TableRow>
-                 ))}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Mobile Cards */}
-          <div className="md:hidden space-y-4">
-            {loading ? <p className="text-center">Cargando...</p> : profiles.map((profile) => (
-              <Card key={profile.id} className="bg-white dark:bg-gray-800">
-                <CardHeader>
-                  <CardTitle>{profile.full_name}</CardTitle>
-                  <CardDescription>{profile.commerce_name}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label>Rol</Label>
-                    <Select defaultValue={profile.role} onValueChange={(newRole) => handleRoleChange(profile.id, newRole)}>
-                      <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="aprobado">Aprobado</SelectItem>
-                        <SelectItem value="cajero">Cajero</SelectItem>
-                        <SelectItem value="pendiente">Pendiente</SelectItem>
-                        <SelectItem value="admin">Admin</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button variant="destructive" size="sm" onClick={() => setUserToDelete(profile)} className="w-full">
-                    <Trash2 className="mr-2 h-4 w-4" />
-                    Eliminar
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        </section>
-      </div>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
       <AlertDialog open={!!userToDelete} onOpenChange={() => setUserToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
