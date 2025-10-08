@@ -1,5 +1,5 @@
 import { Link, NavLink, Outlet, useLocation, Navigate } from "react-router-dom";
-import { Home, ShoppingCart, Truck, Receipt, BarChart3, Menu } from "lucide-react";
+import { Home, ShoppingCart, Truck, Receipt, BarChart3, Menu, Package } from "lucide-react";
 import { UserNav } from "@/components/layout/UserNav";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,8 +9,8 @@ import { useState } from "react";
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   cn(
-    "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary",
-    isActive && "bg-muted text-primary"
+    "flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all duration-200 ease-in-out hover:text-primary hover:bg-muted hover:pl-4",
+    isActive && "bg-muted text-primary font-semibold"
   );
 
 const NavigationLinks = ({ onLinkClick }: { onLinkClick?: () => void }) => {
@@ -37,7 +37,7 @@ const NavigationLinks = ({ onLinkClick }: { onLinkClick?: () => void }) => {
             Compras
           </NavLink>
           <NavLink to="/dashboard/inventario" className={navLinkClass} onClick={onLinkClick}>
-            <Home className="h-4 w-4" />
+            <Package className="h-4 w-4" />
             Inventario
           </NavLink>
           <NavLink to="/dashboard/proveedores" className={navLinkClass} onClick={onLinkClick}>
