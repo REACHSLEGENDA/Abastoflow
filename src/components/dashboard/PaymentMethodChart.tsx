@@ -46,13 +46,13 @@ export default function PaymentMethodChart() {
       </CardHeader>
       <CardContent>
         {loading ? (
-          <Skeleton className="h-[200px] w-full" />
+          <Skeleton className="h-[240px] w-full" />
         ) : data.length === 0 ? (
           <p className="text-sm text-muted-foreground text-center py-16">No hay datos de ventas para mostrar.</p>
         ) : (
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={240}>
             <PieChart>
-              <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
+              <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80}>
                 {data.map((_entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
