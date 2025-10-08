@@ -4,8 +4,6 @@ import { Card, CardHeader } from "@/components/ui/card";
 export default function WelcomeBanner() {
   const { profile } = useAuth();
 
-  const gifSrc = "https://raw.githubusercontent.com/REACHSLEGENDA/Imagenes/main/Generated-File-October-07-2025-unscreen.gif";
-
   return (
     <Card className="mb-6 animate-fade-in-up">
       <CardHeader>
@@ -20,7 +18,7 @@ export default function WelcomeBanner() {
           </div>
           <div className="hidden md:block">
             <img 
-              src={gifSrc}
+              src="/logo.png"
               alt="Ilustración de bienvenida animada" 
               className="h-24 w-24"
             />
