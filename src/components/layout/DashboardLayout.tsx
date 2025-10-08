@@ -112,7 +112,8 @@ export default function DashboardLayout() {
           </div>
           <UserNav />
         </header>
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+        <main className="relative flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+          <div className="absolute inset-0 bg-[url('/logo.png')] bg-center bg-contain bg-no-repeat opacity-[0.03] pointer-events-none -z-10"></div>
           <Outlet />
         </main>
       </div>
