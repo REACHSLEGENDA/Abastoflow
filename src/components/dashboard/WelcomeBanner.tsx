@@ -1,14 +1,10 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardHeader } from "@/components/ui/card";
-import { useMemo } from "react";
 
 export default function WelcomeBanner() {
   const { profile } = useAuth();
 
-  // Al agregar una marca de tiempo única cuando el componente se monta,
-  // nos aseguramos de que el GIF se recargue y se reproduzca una vez por visita.
-  // Los GIFs que no están configurados para repetirse se detendrán en su último fotograma.
-  const gifSrc = useMemo(() => `/welcome-animation.gif?t=${new Date().getTime()}`, []);
+  const gifSrc = "https://raw.githubusercontent.com/REACHSLEGENDA/Imagenes/main/Generated-File-October-07-2025-unscreen.gif";
 
   return (
     <Card className="mb-6 animate-fade-in-up">
